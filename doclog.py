@@ -95,6 +95,9 @@ class DocLogUI:
         curses.nocbreak()
         curses.endwin()
 
+    def screen_size(self):
+        return self.screen.getmaxyx()
+
     def main(self):
         self.section = self.__section_prompt()
         if self.section == 'OS Specific':
@@ -228,9 +231,21 @@ class DocLogUI:
         self.__app_text_box(self.doclog.retrieveAppDocument(self.app, self.app_category))
 
     def __edit_text(self, intext):
-        self.screen.addstr(4, 2, 'Press Ctrl-g when finished')
+        rows, cols = self.screen_size()
+        self.screen.addstr(4, 2, ' '*cols)
+        self.screen.addstr(5, 0, '┌'+('─'*(cols-2))+'┐')
+        msg = 'Press Ctrl-g when finished editing'
+        fill = cols-len(msg)-2
+        r = int(fill/2)
+        l = fill-r
+        self.screen.addstr(6, 0, '│'+(' '*l)+msg+(' '*r)+'│')
+        self.screen.addstr(7, 0, '├'+('─'*(cols-2))+'┤')
+        self.screen.addstr(8, 0, '│'+(' '*(cols-2))+'│')
+        for i in range(rows-8-2):
+            self.screen.addstr(8+i, 0, '│'+(' '*(cols-2))+'│')
+        self.screen.addstr(rows-2, 0, '└'+('─'*(cols-2))+'┘')
         curses.noecho()
-        win = curses.newwin(40, 104, 6, 2)
+        win = curses.newwin(rows-11, cols-4, 9, 2)
         tb = curses.textpad.Textbox(win)
         self.screen.refresh()
         for inchar in intext:
