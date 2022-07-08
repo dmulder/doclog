@@ -41,11 +41,11 @@ class DocLog:
     def osList(self):
         return self.oses
 
-    def categoryList(self):
-        return list(self.obj.keys())
+    def categoryList(self, os):
+        return [k for k, v in self.obj.items() if os in v.keys()]
 
-    def categoryAppList(self):
-        return list(self.app_objs.keys())
+    def categoryAppList(self, app):
+        return [k for k, v in self.app_objs.items() if app in v.keys()]
 
     def appendCategory(self, category):
         self.obj[category] = {}
@@ -145,14 +145,14 @@ class DocLogUI:
         self.screen.addstr(2, 2, self.app)
         self.screen.addstr(3, 2, 'Select a Category')
 
-        if len(self.doclog.categoryList()) == 0:
+        if len(self.doclog.categoryAppList(self.app)) == 0:
             self.screen.addstr(5, 2, 'You have no categories logged, add one now: ')
             self.screen.refresh()
             self.doclog.appendCategory(self.screen.getstr(5, 46).decode())
-            return self.doclog.categoryAppList()[0]
+            return self.doclog.categoryAppList(self.app)[0]
         else:
             i = 0
-            categories = self.doclog.categoryAppList()
+            categories = self.doclog.categoryAppList(self.app)
             for i in range(0, len(categories)):
                 self.screen.addstr(i+5, 2, '%d: %s' % (i, categories[i]))
             self.screen.refresh()
@@ -170,7 +170,7 @@ class DocLogUI:
                 selected_text = self.screen.getstr(i+6, 17).decode()
                 self.doclog.appendAppCategory(selected_text)
             else:
-                selected_text = self.doclog.categoryAppList()[selection]
+                selected_text = self.doclog.categoryAppList(self.app)[selection]
             return selected_text
 
     def __section_prompt(self):
@@ -270,13 +270,13 @@ class DocLogUI:
         self.screen.addstr(2, 2, self.os)
         self.screen.addstr(3, 2, 'Select a Category')
 
-        if len(self.doclog.categoryList()) == 0:
+        if len(self.doclog.categoryList(self.os)) == 0:
             self.screen.addstr(5, 2, 'You have no categories logged, add one now: ')
             self.screen.refresh()
             self.doclog.appendCategory(self.screen.getstr(5, 46).decode())
-            return self.doclog.categoryList()[0]
+            return self.doclog.categoryList(self.os)[0]
         else:
-            categories = self.doclog.categoryList()
+            categories = self.doclog.categoryList(self.os)
             for i in range(0, len(categories)):
                 self.screen.addstr(i+5, 2, '%d: %s' % (i, categories[i]))
             self.screen.refresh()
@@ -294,7 +294,7 @@ class DocLogUI:
                 selected_text = self.screen.getstr(i+6, 17).decode()
                 self.doclog.appendCategory(selected_text)
             else:
-                selected_text = self.doclog.categoryList()[selection]
+                selected_text = self.doclog.categoryList(self.os)[selection]
             return selected_text
 
 if __name__ == "__main__":
