@@ -202,7 +202,7 @@ class DocLogUI:
             self.doclog.saveDocument(self.os, self.category, self.__edit_text(intext))
         else:
             outtext = intext.split('\n')
-            h, w, y, x = self.__box_view('Press \'e\' to edit, \'q\' to quit, or any other key to continue')
+            h, w, y, x = self.__box_view('Press \'e\' to edit, or \'q\' to quit')
             for i in range(0, len(outtext)):
                 self.screen.addstr(y+i, x, outtext[i])
             ans = self.screen.getch()
@@ -220,7 +220,7 @@ class DocLogUI:
             self.doclog.saveAppDocument(self.app, self.app_category, self.__edit_text(intext))
         else:
             outtext = intext.split('\n')
-            h, w, y, x = self.__box_view('Press \'e\' to edit, \'q\' to quit, or any other key to continue')
+            h, w, y, x = self.__box_view('Press \'e\' to edit, or \'q\' to quit')
             for i in range(0, len(outtext)):
                 self.screen.addstr(y+i, x, outtext[i])
             ans = self.screen.getch()
