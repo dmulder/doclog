@@ -202,9 +202,9 @@ class DocLogUI:
             self.doclog.saveDocument(self.os, self.category, self.__edit_text(intext))
         else:
             outtext = intext.split('\n')
+            h, w, y, x = self.__box_view('Press \'e\' to edit, \'q\' to quit, or any other key to continue')
             for i in range(0, len(outtext)):
-                self.screen.addstr(5+i, 2, outtext[i])
-            self.screen.addstr(40, 2, 'Press \'e\' to edit, \'q\' to quit, or any other key to continue')
+                self.screen.addstr(y+i, x, outtext[i])
             ans = self.screen.getch()
             if ans == 101:
                 self.doclog.saveDocument(self.os, self.category, self.__edit_text(intext))
@@ -220,9 +220,9 @@ class DocLogUI:
             self.doclog.saveAppDocument(self.app, self.app_category, self.__edit_text(intext))
         else:
             outtext = intext.split('\n')
+            h, w, y, x = self.__box_view('Press \'e\' to edit, \'q\' to quit, or any other key to continue')
             for i in range(0, len(outtext)):
-                self.screen.addstr(5+i, 2, outtext[i])
-            self.screen.addstr(40, 2, 'Press \'e\' to edit, \'q\' to quit, or any other key to continue')
+                self.screen.addstr(y+i, x, outtext[i])
             ans = self.screen.getch()
             if ans == 101:
                 self.doclog.saveAppDocument(self.app, self.app_category, self.__edit_text(intext))
@@ -231,10 +231,23 @@ class DocLogUI:
         self.__app_text_box(self.doclog.retrieveAppDocument(self.app, self.app_category))
 
     def __edit_text(self, intext):
+        msg = 'Press Ctrl-g when finished editing'
+        h, w, y, x = self.__box_view(msg)
+        curses.noecho()
+        win = curses.newwin(h, w, y, x)
+        tb = curses.textpad.Textbox(win)
+        self.screen.refresh()
+        for inchar in intext:
+            tb.do_command(ord(inchar))
+        text = tb.edit()
+        self.screen.clear()
+        curses.echo()
+        return text
+
+    def __box_view(self, msg):
         rows, cols = self.screen_size()
         self.screen.addstr(4, 2, ' '*cols)
         self.screen.addstr(5, 0, '┌'+('─'*(cols-2))+'┐')
-        msg = 'Press Ctrl-g when finished editing'
         fill = cols-len(msg)-2
         r = int(fill/2)
         l = fill-r
@@ -244,16 +257,7 @@ class DocLogUI:
         for i in range(rows-8-2):
             self.screen.addstr(8+i, 0, '│'+(' '*(cols-2))+'│')
         self.screen.addstr(rows-2, 0, '└'+('─'*(cols-2))+'┘')
-        curses.noecho()
-        win = curses.newwin(rows-11, cols-4, 9, 2)
-        tb = curses.textpad.Textbox(win)
-        self.screen.refresh()
-        for inchar in intext:
-            tb.do_command(ord(inchar))
-        text = tb.edit()
-        self.screen.clear()
-        curses.echo()
-        return text
+        return rows-10, cols-4, 8, 2
 
     def __os_prompt(self):
         if len(self.doclog.osList()) == 0:
