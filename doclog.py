@@ -228,10 +228,10 @@ class DocLogUI:
         self.__app_text_box(self.doclog.retrieveAppDocument(self.app, self.app_category))
 
     def __edit_text(self, intext):
+        self.screen.addstr(4, 2, 'Press Ctrl-g when finished')
         curses.noecho()
-        win = curses.newwin(40, 104, 5, 2)
+        win = curses.newwin(40, 104, 6, 2)
         tb = curses.textpad.Textbox(win)
-        self.screen.addstr(44, 2, 'Press Ctrl-G when finished'+' '*40)
         self.screen.refresh()
         for inchar in intext:
             tb.do_command(ord(inchar))
