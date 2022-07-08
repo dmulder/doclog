@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 import os, os.path, pickle, curses, curses.textpad, traceback, argparse, signal
 
 def stop(signal, frame):
@@ -20,9 +20,9 @@ class DocLog:
     def __enter__(self):
         if os.path.exists(os.path.expanduser(self.logfile)):
             try:
-                (self.obj, self.oses, self.apps, self.app_objs) = pickle.load(open(os.path.expanduser(self.logfile), 'r'))
+                (self.obj, self.oses, self.apps, self.app_objs) = pickle.load(open(os.path.expanduser(self.logfile), 'rb'))
             except:
-                (self.obj, self.oses) = pickle.load(open(os.path.expanduser(self.logfile), 'r'))
+                (self.obj, self.oses) = pickle.load(open(os.path.expanduser(self.logfile), 'rb'))
         else:
             self.obj = {}
             self.oses = []
@@ -33,7 +33,7 @@ class DocLog:
     def __exit__(self, type, value, traceback):
         if not os.path.exists(os.path.dirname(os.path.expanduser(self.logfile))):
             os.mkdir(os.path.dirname(os.path.expanduser(self.logfile)))
-        pickle.dump((self.obj, self.oses, self.apps, self.app_objs), open(os.path.expanduser(self.logfile), 'w'))
+        pickle.dump((self.obj, self.oses, self.apps, self.app_objs), open(os.path.expanduser(self.logfile), 'wb'))
 
     def appendOS(self, os):
         self.oses.append(os)
@@ -42,10 +42,10 @@ class DocLog:
         return self.oses
 
     def categoryList(self):
-        return self.obj.keys()
+        return list(self.obj.keys())
 
     def categoryAppList(self):
-        return self.app_objs.keys()
+        return list(self.app_objs.keys())
 
     def appendCategory(self, category):
         self.obj[category] = {}
@@ -119,7 +119,7 @@ class DocLogUI:
         if len(self.doclog.appList()) == 0:
             self.screen.addstr(2, 2, 'You have no Applications logged, add one now: ')
             self.screen.refresh()
-            self.doclog.appendApp(self.screen.getstr(2, 48))
+            self.doclog.appendApp(self.screen.getstr(2, 48).decode())
             return self.doclog.appList()[0]
         else:
             apps = self.doclog.appList()
@@ -136,7 +136,7 @@ class DocLogUI:
                     pass
             if selection == i:
                 self.screen.addstr(i+5, 2, 'Application name: '+' '*40)
-                self.doclog.appendApp(self.screen.getstr(i+5, 11))
+                self.doclog.appendApp(self.screen.getstr(i+5, 11).decode())
             return self.doclog.appList()[selection]
 
     def __app_category_prompt(self):
@@ -148,7 +148,7 @@ class DocLogUI:
         if len(self.doclog.categoryList()) == 0:
             self.screen.addstr(5, 2, 'You have no categories logged, add one now: ')
             self.screen.refresh()
-            self.doclog.appendCategory(self.screen.getstr(5, 46))
+            self.doclog.appendCategory(self.screen.getstr(5, 46).decode())
             return self.doclog.categoryAppList()[0]
         else:
             i = 0
@@ -167,7 +167,7 @@ class DocLogUI:
             selected_text = ''
             if selection == i:
                 self.screen.addstr(i+6, 2, 'Category name: '+' '*40)
-                selected_text = self.screen.getstr(i+6, 17)
+                selected_text = self.screen.getstr(i+6, 17).decode()
                 self.doclog.appendAppCategory(selected_text)
             else:
                 selected_text = self.doclog.categoryAppList()[selection]
@@ -244,7 +244,7 @@ class DocLogUI:
         if len(self.doclog.osList()) == 0:
             self.screen.addstr(2, 2, 'You have no OSes logged, add one now: ')
             self.screen.refresh()
-            self.doclog.appendOS(self.screen.getstr(2, 40))
+            self.doclog.appendOS(self.screen.getstr(2, 40).decode())
             return self.doclog.osList()[0]
         else:
             oses = self.doclog.osList()
@@ -261,7 +261,7 @@ class DocLogUI:
                     pass
             if selection == i:
                 self.screen.addstr(i+5, 2, 'OS name: '+' '*40)
-                self.doclog.appendOS(self.screen.getstr(i+5, 11))
+                self.doclog.appendOS(self.screen.getstr(i+5, 11).decode())
             return self.doclog.osList()[selection]
 
     def __category_prompt(self):
@@ -273,7 +273,7 @@ class DocLogUI:
         if len(self.doclog.categoryList()) == 0:
             self.screen.addstr(5, 2, 'You have no categories logged, add one now: ')
             self.screen.refresh()
-            self.doclog.appendCategory(self.screen.getstr(5, 46))
+            self.doclog.appendCategory(self.screen.getstr(5, 46).decode())
             return self.doclog.categoryList()[0]
         else:
             categories = self.doclog.categoryList()
@@ -291,7 +291,7 @@ class DocLogUI:
             selected_text = ''
             if selection == i:
                 self.screen.addstr(i+6, 2, 'Category name: '+' '*40)
-                selected_text = self.screen.getstr(i+6, 17)
+                selected_text = self.screen.getstr(i+6, 17).decode()
                 self.doclog.appendCategory(selected_text)
             else:
                 selected_text = self.doclog.categoryList()[selection]
